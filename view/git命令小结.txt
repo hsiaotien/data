@@ -1,0 +1,90 @@
+git命令小结
+
+基本使用:
+1.创建版本库				git init (把所在目录变成Git可以管理的仓库)
+2.添加文件到暂存区			git add <file> (将文件添加到暂存区. 即工作区文件到暂存区)
+3.提交文件到本地仓库		git commit (将暂存区文件提交到本地仓库,注意需要先add添加)
+
+概念:
+Git 工作区、暂存区和版本库概念,工作区就是你在电脑里能看到的目录(其中.git文件夹是Git的版本库,不算工作区).
+
+把文件往Git版本库里添加的时候，是分两步执行的：
+第一步是用git add把文件添加进去，实际上就是把文件修改添加到暂存区.
+第二步是用git commit提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+创建Git版本库时，Git自动为我们创建了唯一一个master分支，所以，现在，git commit就是往master分支上提交更改。
+可以简单理解为，需要提交的文件修改通通放到暂存区，然后，一次性提交暂存区的所有修改。
+
+4.差异比较					git diff -- <file> 		查看工作区和版本库里面最新版本的区别,即正在编辑的和已提交到版本库(本地仓库)区别)
+5.查看状态 					git status 				查看当前工作区的状态,根据需求继续添加提交或者撤销
+6.日志查看					git log  				查看历史的每次提交信息(Git通过其中唯一的id来区分每次提交,在版本回退切换,需要使用)
+可以更优雅的查看 git log --pretty=oneline  或者  在合并分支时查看 git log --graph --pretty=oneline --abbrev-commit
+此外通过git reflog命令，看到以前的每次执行动作(撤销修改需要查看id)!!!!
+
+7.版本回退					git reset --hard head^  或者 git reset --hard {commit id} (后者更灵活)
+要进行版本回退或前进，一般分两步：(版本的回退，本质是修改HEAD指针的位置)
+1）	通过git log 或 git reflog 查看操作日志吗，查找版本的commit id
+2）	通过 git reset --hard <commit id> 设置HEAD到指定版本
+
+8.撤销修改(git status就可以看到区域的文件可以哪些操作) 				
+a)撤销工作区修改  git checkout -- <file>  
+b)撤销staged（暂存区）修改  git reset HEAD <file>   可以让已在暂存区的文件to unstage,然后继续checkout操作
+
+撤销修改分两种情况：
+1）	撤销工作区修改，使用git checkout -- <file>
+2）	撤销暂存区修改，分两步：
+a)	使用git reset HEAD <file>来撤销暂存区修改。
+b)	使用git checkout -- <file>来撤销工作区修改
+
+9.远程仓库(生成密钥：ssh-keygen -t rsa得到公钥和私钥, 然后将公钥交给git服务器,用于安全通信)
+
+
+首先要关联远程仓库：git remote add origin git@gitee.com:taft31/payou.git
+
+推送本地仓库到远程仓库的master分支：git push -u origin master  后续这样也可以 git push origin master 
+
+克隆远程仓库: git clone 远程仓库地址
+
+小结：
+1）	如果要使用SSH协议与远程仓库同步，就必须先在本地生成公钥和私钥，然后将公钥添加到远程的SSH列表
+2）	如果已经有本地仓库，并且想要与远程仓库关联，一般需要两步：
+a)	通过git remote add origin + 远程仓库地址 进行关联
+b)	通过git push -u origin master推送本地仓库修改到远程仓库
+c)	通过git pull 命令拉取远程库数据
+3）	如果没有本地仓库，先创建远程仓库，然后通过git clone + 远程仓库地址 进行克隆并创建本地仓库
+
+10.分支管理
+总结：
+1）	使用git branch 分支名 创建分支
+2）	使用git checkout 分支名 来切换分支
+3）	也可以使用 git checkout -b 分支名 来完成 创建并切换分支的操作
+4）	使用git merge 分支名 来合并分支到当前分支9
+5）	使用git branch -d 分支名 来删除指定分支，注意：要删除一个未合并的分支。需要使用-D参数进行强制删除
+
+11.解决冲突:
+合并分支时,在不同的分支上对同一个文件做了修改,随后合并分支时无法进行快速合并,自动合并失败，必须先解决文件冲突，才能提交.
+根据需求来解决,失败后打开文件既可以看到冲突情况.解决后再次add添加commit提交
+用git log --graph --pretty=oneline --abbrev-commit命令来查看冲突解决的日志
+
+12.保存工作区状态: git给我们提供了stash功能，可以把当前工作区的内容进行“快照”，等待以后恢复使用.
+git stash 进行快照.
+工作现场还在，Git把stash内容存在某个地方了，但是需要恢复一下，有两个办法：(一般用git stash pop)
+1）	方式1：用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+2）	方式2：用git stash pop，恢复的同时把stash内容也删了：
+3）	注意，以上指令都可以在后面紧跟 stash的序号，来操作指定stash，例如： git stash apply stash@{0}
+
+13.
+客户端工具的使用......类似于命令,只是有图形界面
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+spring-boot快速搭建
+a) 聚合spring-boot-starter-parent(不再担心版本管理问题)
+b) 添加所需要的依赖
+c) 编写启动器
+
+java配置
+xml->注解->java配置->springboot属性注入(松散绑定)->完美属性注入
+其中
+a) java配置. 通过Configuration和PropertiesSource和Value和Bean注解.
+声明配置类\引入配置文件\属性注入值\注册bean,将返回对象注入spring容器.
+b) springboot属性注入.通过ConfigurationProperties(prefix = "jdbc"),声明属性读取类
+通过Configuration和EnableConfigurationProperties(JdbcProperties.class).声明配置类和要使用属性类
+然后通过autowird注入 或者 构造函数注入 或者 Bean注解方法的形参 将属性读取类注入配置类
+( ConfigurationProperties注解声明当前类为属性读取类
+EnableConfigurationProperties(JdbcProperties.class)来声明要使用JdbcProperties这个类的对象 )
+c) 事实上，如果一段属性只有一个Bean需要使用，我们无需将其（JdbcProperties）注入到一个类中。而是直接在需要的地方声明即可.
+直接把@ConfigurationProperties(prefix = "jdbc")声明在需要使用的@Bean的方法上，然后SpringBoot就会自动调用这个Bean（此处是DataSource）的set方法，然后完成注入。使用的前提是：该类必须有对应属性的set方法！
+
+@Configuration
+public class JdbcConfig {
+    
+    @Bean
+    // 声明要注入的属性前缀，SpringBoot会自动把相关属性通过set方法注入到DataSource中
+    @ConfigurationProperties(prefix = "jdbc")
+    public DataSource dataSource() {
+        DruidDataSource dataSource = new DruidDataSource();
+        return dataSource;
+    }
+}

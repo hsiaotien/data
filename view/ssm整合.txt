@@ -1,0 +1,37 @@
+ssm整合
+
+springMVC层
+配置web.xml: 
+1)配置DispatcherServlet拦截一切路径,但静态资源的放行可以在此配置,也可以在springMVC添加xml配置)
+2)配置监听器,抱大腿(监听器是框架提供的,配置即可,属于spring容器抱大腿)
+3)配置全局上下文属性contextConfigLocation.(spring的配置文件路径,包括整合其他的文件)
+4)配置编码过滤器
+
+配置dispatcher-servlet:
+1) 映射器,适配器(配置默认mvc注解驱动即可)
+2) Handler(用注解,配置注解包扫描即可)
+3) 视图解析器
+4) 静态资源的默认处理servlet(xml什么即可)
+
+spring配置
+配置applicationContext.xml
+1) 数据源(数据源文件引入,配置数据源)
+2) 注解包扫描(spring容器)
+3) 配置事物管理(事物管理器,事物通知,通知和切入点的绑定(spring-aspects传统aop配置))
+
+mybaties配置:
+配置mybaties-config: 只剩下一个驼峰命名!!
+配置XxxMapper: 映射文件
+
+spring整合mybaties配置
+applicationContext-mybaties:
+1) 管理sqlSessionFactory (配置sqlSessionFactoryBean)
+ a.告知configLocation的位置
+ b.注入数据源
+ c.mapper.xml 位置
+ d.别名包扫描
+2) 动态代理Mapper接口交给spring(配置MapperScannerConfigurer包扫描)
+ a).扫描包的位置
+ b).sqlSessionFactory注入
+
+

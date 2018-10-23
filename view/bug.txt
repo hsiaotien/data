@@ -1,0 +1,50 @@
+ajax的跨域问题：
+1）Jsonp,底层是将ajax请求转为script src的get请求。并约定回掉函数，服务端按约定返回json,客户端进行回掉即可。这样是非常麻烦的，不同的请求不同的约定，一般我们会将这个过程进行封装，在客户端拼接好随机回掉函数名，发get请求时，将?callback=***即可，服务端取出参数，进行拼接并返回即可。
+
+事实上，jquery对此也进行了封装，只需要datatype写jsonp即可，但底层原理就是上述的描述。
+
+/*jsonp的解决方案中有坑，在springMVC的responseEntity中只是一般会默认转为json,是根据配置选择序列化的转换器，将一系列的消息转换器添加到队列中，其中有一个默认的stringmes..以及根据配置得到的mappjackson之前返回的是对象，用jackson的写，现在是string,会用第一个，他可以写，就不会用其他的了，而他的编码表是8859。
+
+解决：修改注解驱动的默认消息转换器配置，mvc:conf...*/  补充的一点
+
+
+2）springMVC4.2后支持Cros方案，提供了一个过滤器，过滤器中对可访问的域和方式以及是否可带cookie进行了约束（底层原理是修改请求头）,只需要注入此过滤器即可。
+
+3）用nginx方向代理， 如aaa.com 要跨域访问 bbb.com ，发这样的请求aaa.com/path.. 在nginx中配置参数，监听aaa.com的80端口，并设置/path时，反向代理到bbb.com即可。
+
+第一种需要前后端配合。 第二种需要服务端配置。 第三种。需要知道服务端的ip. 都是比较安全的。
+
+
+cookie的写入的问题：
+1.cors跨域时，讲到过跨域请求cookie生效的条件：
+cors跨域时，讲到过跨域请求cookie生效的条件：
+- 服务的响应头中需要携带Access-Control-Allow-Credentials并且为true。
+- 响应头中的Access-Control-Allow-Origin一定不能为*，必须是指定的域名
+- 浏览器发起ajax需要指定withCredentials 为true
+
+2.cookie的唯一标识cookie = “name=value;path=path;domain=domain“，cookie也是有域 的限制，一个网页，只能操作当前域名下的cookie！！！
+在分布式服务中，第一反向代理服务器会改变域。
+server name其实就是请求的时的主机名：Host，之所以改变，有两个原因：
+- 我们使用了nginx反向代理，当监听到api.leyou.com的时候，会自动将请求转发至127.0.0.1:10010，即Zuul。
+- 而后请求到达我们的网关Zuul，Zuul就会根据路径匹配，我们的请求是/api/auth，根据规则被转发到了 127.0.0.1:8087 ，即我们的授权中心。 最终域变成了12.0.0.1并不是原始的域
+
+解决：1）更改nginx配置，让它不要修改我们的host：转发时携带本身的host信息，而不是127.0.0.1.
+2）zuul还会转发一次，也要设置修改网关的配置，add-host-header=true 携带本身的host信息
+3）Zuul内部有默认的过滤器，会对请求和响应头信息进行重组，过滤掉敏感的头信息，
+会发现，这里会通过一个属性为SensitiveHeaders的属性，来获取敏感头列表，然后添加到IgnoredHeaders中，这些头信息就会被忽略。而这个SensitiveHeaders的默认值就包含了set-cookie。即zuul有会过滤掉敏感头
+解决方案有两种：
+全局设置：
+- zuul.sensitive-headers= 
+指定路由设置：
+- zuul.routes.<routeName>.sensitive-headers=
+- zuul.routes.<routeName>.custom-sensitive-headers=true
+思路都是把敏感头设置为null
+
+
+
+
+
+
+
+
+

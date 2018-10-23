@@ -1,0 +1,19 @@
+提升技能,并不断突破黑箱,早日成为大牛.
+
+1.学习前端技术
+html css js jquery node vue jade等
+
+2.学习后端技术
+ssm springboot springcloud
+
+3.学习linux的操作
+需要系统学习linux
+
+4.学习安卓和ios端的技术
+
+不断的敲代码,不断的理解才是学习的王道.
+
+现在对学习过程,各个项目的结构(目录)进行约定.
+
+前端的demo: /demo/front/xxx  对应后台的demo: /demo/back/xxx
+
